@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
   frontDS = robot->getDistanceSensor("frontDS");
   frontDS->enable(timeStep);
 
-  
+
   travelMaze();
   //pickUpTheBox();
   //turnRight();
@@ -137,7 +137,7 @@ void travelMaze() {
             }
 
             std::cout << "CHECKING THE PIECE\n";
-
+     
             // Come back to the main path
             for (int i = 0; i < advanceRightCount; i++) {
                 advanceTileBack();
@@ -208,6 +208,13 @@ void travelMaze() {
         else {
             break;
         }
+    }
+
+    // 180 Turn and go back to A7
+    turnRight();
+    turnRight();
+    for (int i = 0; i < advanceStraightCount; i++) {
+        advanceTile();
     }
 }
 
