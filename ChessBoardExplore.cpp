@@ -24,6 +24,7 @@ void pickUpTheBox();
 void turnRight();
 void turnLeft();
 void advanceTile();
+void travelMaze();
 
 Robot* robot;
 
@@ -69,8 +70,9 @@ int main(int argc, char **argv) {
   frontDS->enable(timeStep);
 
   
-  pickUpTheBox();
-  turnRight();
+  travelMaze();
+  //pickUpTheBox();
+  //turnRight();
   //turnLeft();
   //advanceTile();
   //turnRight();
@@ -103,6 +105,28 @@ int main(int argc, char **argv) {
 
   delete robot;
   return 0;
+}
+
+void travelMaze() {
+    pickUpTheBox();
+
+    while (true) {
+        turnRight();
+
+        double newFrontDSValue = frontDS->getValue();
+        cout << newFrontDSValue << "\n";
+
+        if (newFrontDSValue > 790) {
+            turnLeft();
+            advanceTile();
+        }
+        else {
+            cout << "OBSTACLE FOUND\N";
+            turnLeft();
+            advanceTile();
+        }
+
+    }
 }
 
 void pickUpTheBox() {
