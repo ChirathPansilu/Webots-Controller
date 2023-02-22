@@ -23,6 +23,7 @@ using namespace std;
 void pickUpTheBox();
 void turnRight();
 void turnLeft();
+void advanceTile();
 
 Robot* robot;
 
@@ -70,7 +71,8 @@ int main(int argc, char **argv) {
   
   pickUpTheBox();
   turnRight();
-  turnLeft();
+  //turnLeft();
+  //advanceTile();
   //turnRight();
   //turnLeft();
 
@@ -145,13 +147,17 @@ void turnRight() {
     leftMotor->setPosition(INFINITY);
     rightMotor->setVelocity(1.0);
     leftMotor->setVelocity(-1.0);
-    
-    double duration = TIMESTEP * 830;
+   
     double elapsedTime = 0;
 
-    while (elapsedTime < duration) {
+    while (elapsedTime < 810) {
         robot->step(TIMESTEP);
-        elapsedTime += TIMESTEP;
+
+        double newFrontDSValue = frontDS->getValue();
+
+        cout << newFrontDSValue << "\n";
+
+        elapsedTime++;
     }
 
     rightMotor->setVelocity(0.0);
@@ -166,18 +172,40 @@ void turnLeft() {
     rightMotor->setVelocity(-1.0);
     leftMotor->setVelocity(1.0);
     
-    double duration = TIMESTEP * 830;
     double elapsedTime = 0;
 
-    while (elapsedTime < duration) {
+    while (elapsedTime < 810) {
         robot->step(TIMESTEP);
-        elapsedTime += TIMESTEP;
+        
+        double newFrontDSValue = frontDS->getValue();
+
+        cout << newFrontDSValue << "\n";
+
+        elapsedTime++;
     }
 
     rightMotor->setVelocity(0.0);
     leftMotor->setVelocity(0.0);
 
     cout << "TURNED LEFT\n";
+}
+
+void advanceTile() {
+    double elapsedTime = 0;
+
+    rightMotor->setPosition(INFINITY);
+    leftMotor->setPosition(INFINITY);
+
+    rightMotor->setVelocity(-1.0);
+    leftMotor->setVelocity(-1.0);
+
+    while (elapsedTime < 1190) {
+        robot->step(TIMESTEP);
+        elapsedTime++;
+    }
+
+    rightMotor->setVelocity(0.0);
+    leftMotor->setVelocity(0.0);
 }
 
 
