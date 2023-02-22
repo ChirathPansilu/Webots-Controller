@@ -18,7 +18,6 @@
 
 // All the webots classes are defined in the "webots" namespace
 using namespace webots;
-using namespace std;
 
 void pickUpTheBox();
 void turnRight();
@@ -123,10 +122,10 @@ void travelMaze() {
             turnLeft();
         }
         else {
-            cout << "OBSTACLE FOUND\n";
+            std::cout << "OBSTACLE FOUND\n";
             
             newFrontDSValue = frontDS->getValue();
-            cout << newFrontDSValue << "\n";
+            std::cout << newFrontDSValue << "\n";
 
             // Go to the right chess piece
             int advanceRightCount = 0;
@@ -137,7 +136,7 @@ void travelMaze() {
                 newFrontDSValue = frontDS->getValue();
             }
 
-            cout << "CHECKING THE PIECE\n";
+            std::cout << "CHECKING THE PIECE\n";
 
             // Come back to the main path
             for (int i = 0; i < advanceRightCount; i++) {
@@ -165,6 +164,51 @@ void travelMaze() {
     }
 
     turnLeft();
+    advanceTile();
+
+    while (true) {
+        turnLeft();
+
+        double newFrontDSValue = frontDS->getValue();
+
+        // Check for obstacle on right
+        if (newFrontDSValue > 790) {
+            turnRight();
+        }
+        else {
+            std::cout << "OBSTACLE FOUND\n";
+
+            newFrontDSValue = frontDS->getValue();
+            std::cout << newFrontDSValue << "\n";
+
+            // Go to the right chess piece
+            int advanceRightCount = 0;
+            while (newFrontDSValue > 100) {
+                advanceTile();
+                advanceRightCount++;
+
+                newFrontDSValue = frontDS->getValue();
+            }
+
+            std::cout << "CHECKING THE PIECE\n";
+
+            // Come back to the main path
+            for (int i = 0; i < advanceRightCount; i++) {
+                advanceTileBack();
+            }
+
+            turnRight();
+        }
+
+        newFrontDSValue = frontDS->getValue();
+        if (newFrontDSValue > 100) {
+            advanceTile();
+            advanceStraightCount++;
+        }
+        else {
+            break;
+        }
+    }
 }
 
 void pickUpTheBox() {
@@ -225,7 +269,7 @@ void turnRight() {
     rightMotor->setVelocity(0.0);
     leftMotor->setVelocity(0.0);
 
-    cout << "TURNED RIGHT\n";
+    std::cout << "TURNED RIGHT\n";
 }
 
 void turnLeft() {
@@ -249,7 +293,7 @@ void turnLeft() {
     rightMotor->setVelocity(0.0);
     leftMotor->setVelocity(0.0);
 
-    cout << "TURNED LEFT\n";
+    std::cout << "TURNED LEFT\n";
 }
 
 void advanceTile() {
