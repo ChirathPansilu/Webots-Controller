@@ -37,6 +37,7 @@ Motor* rightFinger;
 Motor* leftFinger;
 
 DistanceSensor* frontDS;
+DistanceSensor* topDS;
 
 // This is the main program of your controller.
 // It creates an instance of your Robot instance, launches its
@@ -68,6 +69,9 @@ int main(int argc, char **argv) {
 
   frontDS = robot->getDistanceSensor("frontDS");
   frontDS->enable(timeStep);
+
+  topDS = robot->getDistanceSensor("topDS");
+  topDS->enable(timeStep);
 
 
   travelMaze();
@@ -137,6 +141,8 @@ void travelMaze() {
             }
 
             std::cout << "CHECKING THE PIECE\n";
+            double topDSValue = topDS->getValue();
+            std::cout << "TOP DS: " << topDSValue << "\n";
      
             // Come back to the main path
             for (int i = 0; i < advanceRightCount; i++) {
@@ -191,6 +197,8 @@ void travelMaze() {
             }
 
             std::cout << "CHECKING THE PIECE\n";
+            double topDSValue = topDS->getValue();
+            std::cout << "TOP DS: " << topDSValue << "\n";
 
             // Come back to the main path
             for (int i = 0; i < advanceRightCount; i++) {
@@ -338,27 +346,3 @@ void advanceTileBack() {
     rightMotor->setVelocity(0.0);
     leftMotor->setVelocity(0.0);
 }
-
-
-
-void lift(Motor* lift, double position) {
-    lift->setVelocity(GRIPPER_MOTOR_MAX_SPEED);
-    lift->setPosition(position);
-}
-
-void moveFingers(Motor* leftFinger, Motor* rightFinger, double position) {
-    leftFinger->setVelocity(GRIPPER_MOTOR_MAX_SPEED);
-    rightFinger->setVelocity(GRIPPER_MOTOR_MAX_SPEED);
-
-    leftFinger->setPosition(position);
-    rightFinger->setPosition(position);
-}
-
-void moveForwards(Motor* leftMotor, Motor* rightMotor, double distance) {
-    leftMotor->setVelocity(1.0);
-    rightMotor->setVelocity(1.0);
-
-    leftMotor->setPosition(distance);
-    rightMotor->setPosition(distance);
-}
-
