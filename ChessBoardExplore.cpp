@@ -111,21 +111,24 @@ int main(int argc, char **argv) {
 void travelMaze() {
     pickUpTheBox();
 
+    int advanceStraightCount = 0;
+
     while (true) {
         turnRight();
 
         double newFrontDSValue = frontDS->getValue();
 
+        // Check for obstacle on right
         if (newFrontDSValue > 790) {
             turnLeft();
-            advanceTile();
         }
         else {
             cout << "OBSTACLE FOUND\n";
             
-            double newFrontDSValue = frontDS->getValue();
+            newFrontDSValue = frontDS->getValue();
             cout << newFrontDSValue << "\n";
 
+            // Go to the right chess piece
             int advanceRightCount = 0;
             while (newFrontDSValue > 100) {
                 advanceTile();
@@ -133,16 +136,35 @@ void travelMaze() {
 
                 newFrontDSValue = frontDS->getValue();
             }
+
             cout << "CHECKING THE PIECE\n";
+
+            // Come back to the main path
             for (int i = 0; i < advanceRightCount; i++) {
                 advanceTileBack();
             }
 
             turnLeft();
-            advanceTile();
         }
 
+        newFrontDSValue = frontDS->getValue();
+        if (newFrontDSValue > 100) {
+            advanceTile();
+            advanceStraightCount++;
+        }
+        else {
+            break;
+        }
     }
+
+    // 180 Turn and go back to A7
+    turnRight();
+    turnRight();
+    for (int i = 0; i < advanceStraightCount; i++) {
+        advanceTile();
+    }
+
+    turnLeft();
 }
 
 void pickUpTheBox() {
