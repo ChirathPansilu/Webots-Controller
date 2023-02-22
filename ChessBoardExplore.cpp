@@ -25,6 +25,7 @@ void turnLeft();
 void advanceTile();
 void advanceTileBack();
 void travelMaze();
+bool checkPiece();
 
 Robot* robot;
 
@@ -38,6 +39,7 @@ Motor* leftFinger;
 
 DistanceSensor* frontDS;
 DistanceSensor* topDS;
+DistanceSensor* frontIR;
 
 // This is the main program of your controller.
 // It creates an instance of your Robot instance, launches its
@@ -72,6 +74,9 @@ int main(int argc, char **argv) {
 
   topDS = robot->getDistanceSensor("topDS");
   topDS->enable(timeStep);
+
+  frontIR = robot->getDistanceSensor("frontIR");
+  frontIR->enable(timeStep);
 
 
   travelMaze();
@@ -141,8 +146,7 @@ void travelMaze() {
             }
 
             std::cout << "CHECKING THE PIECE\n";
-            double topDSValue = topDS->getValue();
-            std::cout << "TOP DS: " << topDSValue << "\n";
+            checkPiece();
      
             // Come back to the main path
             for (int i = 0; i < advanceRightCount; i++) {
@@ -197,8 +201,7 @@ void travelMaze() {
             }
 
             std::cout << "CHECKING THE PIECE\n";
-            double topDSValue = topDS->getValue();
-            std::cout << "TOP DS: " << topDSValue << "\n";
+            checkPiece();
 
             // Come back to the main path
             for (int i = 0; i < advanceRightCount; i++) {
@@ -224,6 +227,22 @@ void travelMaze() {
     for (int i = 0; i < advanceStraightCount; i++) {
         advanceTile();
     }
+}
+
+bool checkPiece() {
+    double topDSValue = topDS->getValue();
+    std::cout << "TOP DS: " << topDSValue << "\n";
+
+    double frontIRValue = frontIR->getValue();
+    std::cout << "FRONT IR: " << frontIRValue << "\n";
+
+    if (topDSValue < 100 && frontIRValue < 500) {
+        std::cout << "WHITE KING FOUND\n";
+
+        return true;
+    }
+
+    return false;
 }
 
 void pickUpTheBox() {
