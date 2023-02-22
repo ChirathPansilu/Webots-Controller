@@ -24,6 +24,7 @@ void pickUpTheBox();
 void turnRight();
 void turnLeft();
 void advanceTile();
+void advanceTileBack();
 void travelMaze();
 
 Robot* robot;
@@ -114,14 +115,29 @@ void travelMaze() {
         turnRight();
 
         double newFrontDSValue = frontDS->getValue();
-        cout << newFrontDSValue << "\n";
 
         if (newFrontDSValue > 790) {
             turnLeft();
             advanceTile();
         }
         else {
-            cout << "OBSTACLE FOUND\N";
+            cout << "OBSTACLE FOUND\n";
+            
+            double newFrontDSValue = frontDS->getValue();
+            cout << newFrontDSValue << "\n";
+
+            int advanceRightCount = 0;
+            while (newFrontDSValue > 100) {
+                advanceTile();
+                advanceRightCount++;
+
+                newFrontDSValue = frontDS->getValue();
+            }
+            cout << "CHECKING THE PIECE\n";
+            for (int i = 0; i < advanceRightCount; i++) {
+                advanceTileBack();
+            }
+
             turnLeft();
             advanceTile();
         }
@@ -151,7 +167,7 @@ void pickUpTheBox() {
 
         double newFrontDSValue = frontDS->getValue();
 
-        cout << newFrontDSValue << "\n";
+        //cout << newFrontDSValue << "\n";
 
         if (newFrontDSValue < 13) {
             rightFinger->setPosition(0.06);
@@ -177,9 +193,9 @@ void turnRight() {
     while (elapsedTime < 810) {
         robot->step(TIMESTEP);
 
-        double newFrontDSValue = frontDS->getValue();
+        //double newFrontDSValue = frontDS->getValue();
 
-        cout << newFrontDSValue << "\n";
+        //cout << newFrontDSValue << "\n";
 
         elapsedTime++;
     }
@@ -201,9 +217,9 @@ void turnLeft() {
     while (elapsedTime < 810) {
         robot->step(TIMESTEP);
         
-        double newFrontDSValue = frontDS->getValue();
+        //double newFrontDSValue = frontDS->getValue();
 
-        cout << newFrontDSValue << "\n";
+        //cout << newFrontDSValue << "\n";
 
         elapsedTime++;
     }
@@ -231,6 +247,25 @@ void advanceTile() {
     rightMotor->setVelocity(0.0);
     leftMotor->setVelocity(0.0);
 }
+
+void advanceTileBack() {
+    double elapsedTime = 0;
+
+    rightMotor->setPosition(INFINITY);
+    leftMotor->setPosition(INFINITY);
+
+    rightMotor->setVelocity(1.0);
+    leftMotor->setVelocity(1.0);
+
+    while (elapsedTime < 1190) {
+        robot->step(TIMESTEP);
+        elapsedTime++;
+    }
+
+    rightMotor->setVelocity(0.0);
+    leftMotor->setVelocity(0.0);
+}
+
 
 
 void lift(Motor* lift, double position) {
