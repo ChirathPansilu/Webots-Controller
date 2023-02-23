@@ -26,6 +26,7 @@ void advanceTile(double s = 1.0);
 void advanceTileBack(double s = 1.0);
 void travelMaze();
 bool checkPiece();
+void dropTheBox();
 
 Robot* robot;
 
@@ -120,6 +121,7 @@ void travelMaze() {
     pickUpTheBox();
 
     int advanceStraightCount = 0;
+    bool kingFound = false;
 
     while (true) {
         turnRight();
@@ -146,7 +148,7 @@ void travelMaze() {
             }
 
             std::cout << "CHECKING THE PIECE\n";
-            checkPiece();
+            kingFound = checkPiece();
      
             // Come back to the main path
             for (int i = 0; i < advanceRightCount; i++) {
@@ -154,6 +156,14 @@ void travelMaze() {
             }
 
             turnLeft();
+        }
+
+        if (kingFound) {
+            advanceTileBack();
+            advanceTile(0.6);
+            dropTheBox();
+            advanceTileBack(0.6);
+            break;
         }
 
         newFrontDSValue = frontDS->getValue();
@@ -364,4 +374,14 @@ void advanceTileBack(double s) {
 
     rightMotor->setVelocity(0.0);
     leftMotor->setVelocity(0.0);
+}
+
+void dropTheBox() {
+    gripperLift->setVelocity(0.1);
+    rightFinger->setVelocity(0.1);
+    leftFinger->setVelocity(0.1);
+
+    gripperLift->setPosition(0.13);
+    rightFinger->setPosition(0.1);
+    leftFinger->setPosition(0.1);
 }
