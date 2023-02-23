@@ -211,7 +211,7 @@ void travelMaze() {
             }
 
             std::cout << "CHECKING THE PIECE\n";
-            checkPiece();
+            kingFound = checkPiece();
 
             // Come back to the main path
             for (int i = 0; i < advanceRightCount; i++) {
@@ -219,6 +219,14 @@ void travelMaze() {
             }
 
             turnRight();
+        }
+
+        if (kingFound) {
+            advanceTileBack();
+            advanceTile(0.6);
+            dropTheBox();
+            advanceTileBack(0.6);
+            break;
         }
 
         newFrontDSValue = frontDS->getValue();
