@@ -22,8 +22,8 @@ using namespace webots;
 void pickUpTheBox();
 void turnRight();
 void turnLeft();
-void advanceTile();
-void advanceTileBack();
+void advanceTile(double s = 1.0);
+void advanceTileBack(double s = 1.0);
 void travelMaze();
 bool checkPiece();
 
@@ -330,7 +330,7 @@ void turnLeft() {
     std::cout << "TURNED LEFT\n";
 }
 
-void advanceTile() {
+void advanceTile(double s) {
     double elapsedTime = 0;
 
     rightMotor->setPosition(INFINITY);
@@ -339,7 +339,7 @@ void advanceTile() {
     rightMotor->setVelocity(-1.0);
     leftMotor->setVelocity(-1.0);
 
-    while (elapsedTime < 1190) {
+    while (elapsedTime < 1190 * s) {
         robot->step(TIMESTEP);
         elapsedTime++;
     }
@@ -348,7 +348,7 @@ void advanceTile() {
     leftMotor->setVelocity(0.0);
 }
 
-void advanceTileBack() {
+void advanceTileBack(double s) {
     double elapsedTime = 0;
 
     rightMotor->setPosition(INFINITY);
@@ -357,7 +357,7 @@ void advanceTileBack() {
     rightMotor->setVelocity(1.0);
     leftMotor->setVelocity(1.0);
 
-    while (elapsedTime < 1190) {
+    while (elapsedTime < 1190 * s) {
         robot->step(TIMESTEP);
         elapsedTime++;
     }
