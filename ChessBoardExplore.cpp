@@ -182,7 +182,7 @@ void travelMaze() {
         double newFrontDSValue = frontDS->getValue();
 
         // Check for obstacle on right
-        if (newFrontDSValue > 790) {
+        if (newFrontDSValue > 900) {
             turnRight();
         }
         else {
