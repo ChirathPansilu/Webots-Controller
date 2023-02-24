@@ -12,6 +12,7 @@
 #include <webots/DistanceSensor.hpp>
 
 #include <iostream>
+#include <vector>
 
 #define GRIPPER_MOTOR_MAX_SPEED 0.1
 #define TIMESTEP 16
@@ -27,6 +28,16 @@ void advanceTileBack(double s = 1.0);
 void travelMaze();
 bool checkPiece();
 void dropTheBox();
+void DFS();
+void DFS_1();
+
+int initialRow = 0;
+int initialColumn = 2;
+//int chessboard[9][9] = { 0 };
+int posCounter[4] = { 0 };
+int pos = 0;
+
+std::vector<std::vector<int>> chessboard{};
 
 Robot* robot;
 
@@ -79,8 +90,18 @@ int main(int argc, char **argv) {
   frontIR = robot->getDistanceSensor("frontIR");
   frontIR->enable(timeStep);
 
+  for (int i = 0; i < 9; i++) {
+      std::vector<int> newVec{};
+      for (int j = 0; j < 9; j++) {
+          newVec.push_back(0);
+      }
+      chessboard.push_back(newVec);
+  }
+  
+  //advanceTile();
+  DFS_1();
 
-  travelMaze();
+  //travelMaze();
   //pickUpTheBox();
   //turnRight();
   //turnLeft();
@@ -392,4 +413,57 @@ void dropTheBox() {
     gripperLift->setPosition(0.13);
     rightFinger->setPosition(0.1);
     leftFinger->setPosition(0.1);
+}
+
+void DFS() {
+    double newFrontDSValue = frontDS->getValue();
+
+    if (newFrontDSValue < 100) {
+        return;
+    }
+
+    advanceTile();
+    DFS();
+    turnRight();
+    DFS();
+    turnLeft();
+    turnLeft();
+    DFS();
+    turnRight();
+    advanceTileBack();
+}
+
+void DFS_1() {
+    
+    int currentRow = initialRow + posCounter[0] - posCounter[2];
+    int currentColumn = initialColumn + posCounter[1] - posCounter[3];
+
+    std::cout << "Current Position: (" << currentRow << ", " << currentColumn << ")\t" << chessboard[currentRow][currentColumn] << "\n";
+
+    double newFrontDSValue = frontDS->getValue();
+
+    if ((currentColumn == 9 && currentRow == 9) || chessboard[currentRow][currentColumn] == 1 || newFrontDSValue < 100 ) {
+        if ((currentColumn == 9 && currentRow == 9)) std::cout << "first\n";
+        else if (chessboard[currentRow][currentColumn] == 1) std::cout << "second\n";
+        else std::cout << "third\n";
+
+        return;
+    }
+
+    chessboard[currentRow][currentColumn] = 1;
+
+    advanceTile();
+    posCounter[pos % 4]++;
+    DFS_1();
+    turnRight();
+    pos++;
+    DFS_1();
+    turnLeft();
+    turnLeft();
+    pos+=2;
+    DFS_1();
+    turnRight();
+    advanceTileBack();
+    pos -= 3;
+    posCounter[pos % 4]--;
 }
