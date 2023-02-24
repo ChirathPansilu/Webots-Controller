@@ -442,10 +442,16 @@ void DFS_1() {
 
     double newFrontDSValue = frontDS->getValue();
 
-    if ((currentColumn == 9 && currentRow == 9) || chessboard[currentRow][currentColumn] == 1 || newFrontDSValue < 100 ) {
+    posCounter[pos % 4]++;
+    int nextRow = initialRow + posCounter[0] - posCounter[2];
+    int nextColumn = initialColumn + posCounter[1] - posCounter[3];
+
+    if ((currentColumn == 9 && currentRow == 9) || chessboard[nextRow][nextColumn] == 1 || newFrontDSValue < 100 ) {
         if ((currentColumn == 9 && currentRow == 9)) std::cout << "first\n";
-        else if (chessboard[currentRow][currentColumn] == 1) std::cout << "second\n";
+        else if (chessboard[nextRow][nextRow] == 1) std::cout << "second\n";
         else std::cout << "third\n";
+
+        posCounter[pos % 4]--;
 
         return;
     }
@@ -453,7 +459,6 @@ void DFS_1() {
     chessboard[currentRow][currentColumn] = 1;
 
     advanceTile();
-    posCounter[pos % 4]++;
     DFS_1();
     turnRight();
     pos++;
