@@ -90,14 +90,14 @@ int main(int argc, char **argv) {
   frontIR = robot->getDistanceSensor("frontIR");
   frontIR->enable(timeStep);
 
-  for (int i = 0; i < 9; i++) {
+  for (int i = 0; i < 10; i++) {
       std::vector<int> newVec{};
-      for (int j = 0; j < 9; j++) {
+      for (int j = 0; j < 10; j++) {
           newVec.push_back(0);
       }
       chessboard.push_back(newVec);
   }
-  
+
   //advanceTile();
   DFS_1();
 
@@ -434,6 +434,9 @@ void DFS() {
 }
 
 void DFS_1() {
+
+    //This is needed to get the frontDS value if this is not called before
+    //robot->step(TIMESTEP);
     
     int currentRow = initialRow + posCounter[0] - posCounter[2];
     int currentColumn = initialColumn + posCounter[1] - posCounter[3];
@@ -441,12 +444,13 @@ void DFS_1() {
     std::cout << "Current Position: (" << currentRow << ", " << currentColumn << ")\t" << chessboard[currentRow][currentColumn] << "\n";
 
     double newFrontDSValue = frontDS->getValue();
+    std::cout << "frontDS: " << newFrontDSValue << "\n";
 
     posCounter[pos % 4]++;
     int nextRow = initialRow + posCounter[0] - posCounter[2];
     int nextColumn = initialColumn + posCounter[1] - posCounter[3];
 
-    if ((currentColumn == 9 && currentRow == 9) || chessboard[nextRow][nextColumn] == 1 || newFrontDSValue < 100 ) {
+    if ((nextColumn == 9 && nextRow == 9) || chessboard[nextRow][nextColumn] == 1 || newFrontDSValue < 100) {
         if ((currentColumn == 9 && currentRow == 9)) std::cout << "first\n";
         else if (chessboard[nextRow][nextRow] == 1) std::cout << "second\n";
         else std::cout << "third\n";
@@ -467,8 +471,14 @@ void DFS_1() {
     turnLeft();
     pos+=2;
     DFS_1();
+    //turnRight();
+    //advanceTileBack();
+
+    // Going back
+    turnLeft();
+    advanceTile();
     turnRight();
-    advanceTileBack();
+    turnRight();
     pos -= 3;
     posCounter[pos % 4]--;
 }
