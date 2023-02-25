@@ -37,6 +37,8 @@ int initialColumn = 3;
 int posCounter[4] = { 0 };
 int pos = 0;
 
+bool exitFound = false;
+
 std::vector<std::vector<int>> chessboard{};
 
 Robot* robot;
@@ -106,6 +108,8 @@ int main(int argc, char **argv) {
 
   //advanceTile();
   DFS_1();
+
+  std::cout << "DONE DONE AND DONE\n";
 
   //travelMaze();
   //pickUpTheBox();
@@ -441,6 +445,8 @@ void DFS() {
 
 void DFS_1() {
 
+    if (exitFound) return;
+
     //This is needed to get the frontDS value if this is not called before
     //robot->step(TIMESTEP);
     
@@ -457,7 +463,12 @@ void DFS_1() {
     int nextColumn = initialColumn + posCounter[1] - posCounter[3];
 
     if ((currentColumn == 10 && currentRow == 10) || chessboard[nextRow][nextColumn] == 1 || newFrontDSValue < 100) {
-        if ((currentColumn == 10 && currentRow == 10)) std::cout << "first\n";
+        if ((currentColumn == 10 && currentRow == 10)) {
+            std::cout << "first\n";
+            std::cout << "Exit Found\n";
+            exitFound = true;
+        }
+
         else if (chessboard[nextRow][nextRow] == 1) std::cout << "second\n";
         else std::cout << "third\n";
 
@@ -470,13 +481,19 @@ void DFS_1() {
 
     advanceTile();
     DFS_1();
+    if (exitFound) return;
+    
     turnRight();
     pos++;
     DFS_1();
+    if (exitFound) return;
+    
     turnLeft();
     turnLeft();
     pos+=2;
     DFS_1();
+    if (exitFound) return;
+    
     //turnRight();
     //advanceTileBack();
 
