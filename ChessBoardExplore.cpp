@@ -31,8 +31,8 @@ void dropTheBox();
 void DFS();
 void DFS_1();
 
-int initialRow = 0;
-int initialColumn = 2;
+int initialRow = 1;
+int initialColumn = 3;
 //int chessboard[9][9] = { 0 };
 int posCounter[4] = { 0 };
 int pos = 0;
@@ -90,12 +90,18 @@ int main(int argc, char **argv) {
   frontIR = robot->getDistanceSensor("frontIR");
   frontIR->enable(timeStep);
 
-  for (int i = 0; i < 10; i++) {
+  // create the chessboard with extended walls
+  for (int i = 0; i < 12; i++) {
       std::vector<int> newVec{};
-      for (int j = 0; j < 10; j++) {
-          newVec.push_back(0);
+      for (int j = 0; j < 12; j++) {
+          newVec.push_back(1);
       }
       chessboard.push_back(newVec);
+  }
+
+  for (int i = 1; i < 11; i++) {
+      for (int j = 1; j < 11; j++)
+          chessboard[i][j] = 0;
   }
 
   //advanceTile();
@@ -450,8 +456,8 @@ void DFS_1() {
     int nextRow = initialRow + posCounter[0] - posCounter[2];
     int nextColumn = initialColumn + posCounter[1] - posCounter[3];
 
-    if ((nextColumn == 9 && nextRow == 9) || chessboard[nextRow][nextColumn] == 1 || newFrontDSValue < 100) {
-        if ((currentColumn == 9 && currentRow == 9)) std::cout << "first\n";
+    if ((currentColumn == 10 && currentRow == 10) || chessboard[nextRow][nextColumn] == 1 || newFrontDSValue < 100) {
+        if ((currentColumn == 10 && currentRow == 10)) std::cout << "first\n";
         else if (chessboard[nextRow][nextRow] == 1) std::cout << "second\n";
         else std::cout << "third\n";
 
