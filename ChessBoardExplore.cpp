@@ -120,7 +120,8 @@ int main(int argc, char **argv) {
   //if (exitDirectionRow == 10 && exitDirectionColumn == 11)
   //    turnLeft();
 
-  goToExit();
+  //goToExit();
+  travelMaze();
 
   //travelMaze();
   //pickUpTheBox();
@@ -205,6 +206,7 @@ void travelMaze() {
             advanceTile(0.6);
             dropTheBox();
             advanceTileBack(0.6);
+            advanceStraightCount--;
             break;
         }
 
@@ -226,66 +228,74 @@ void travelMaze() {
     }
 
     turnLeft();
-    advanceTile();
+    robot->step(TIMESTEP);
+    bool canGoRight = frontDS->getValue() > 100;
 
-    while (true) {
-        turnLeft();
+    if (!kingFound && canGoRight) {
 
-        double newFrontDSValue = frontDS->getValue();
+        advanceTile();
+        advanceStraightCount = 1;
 
-        // Check for obstacle on right
-        if (newFrontDSValue > 900) {
-            turnRight();
-        }
-        else {
-            std::cout << "OBSTACLE FOUND\n";
+        while (true) {
+            turnLeft();
 
-            newFrontDSValue = frontDS->getValue();
-            std::cout << newFrontDSValue << "\n";
+            double newFrontDSValue = frontDS->getValue();
 
-            // Go to the right chess piece
-            int advanceRightCount = 0;
-            while (newFrontDSValue > 100) {
-                advanceTile();
-                advanceRightCount++;
+            // Check for obstacle on right
+            if (newFrontDSValue > 900) {
+                turnRight();
+            }
+            else {
+                std::cout << "OBSTACLE FOUND\n";
 
                 newFrontDSValue = frontDS->getValue();
+                std::cout << newFrontDSValue << "\n";
+
+                // Go to the right chess piece
+                int advanceRightCount = 0;
+                while (newFrontDSValue > 100) {
+                    advanceTile();
+                    advanceRightCount++;
+
+                    newFrontDSValue = frontDS->getValue();
+                }
+
+                std::cout << "CHECKING THE PIECE\n";
+                kingFound = checkPiece();
+
+                // Come back to the main path
+                for (int i = 0; i < advanceRightCount; i++) {
+                    advanceTileBack();
+                }
+
+                turnRight();
             }
 
-            std::cout << "CHECKING THE PIECE\n";
-            kingFound = checkPiece();
-
-            // Come back to the main path
-            for (int i = 0; i < advanceRightCount; i++) {
+            if (kingFound) {
                 advanceTileBack();
+                advanceTile(0.6);
+                dropTheBox();
+                advanceTileBack(0.6);
+                advanceStraightCount--;
+                break;
             }
 
-            turnRight();
+            newFrontDSValue = frontDS->getValue();
+            if (newFrontDSValue > 100) {
+                advanceTile();
+                advanceStraightCount++;
+            }
+            else {
+                break;
+            }
         }
 
-        if (kingFound) {
-            advanceTileBack();
-            advanceTile(0.6);
-            dropTheBox();
-            advanceTileBack(0.6);
-            break;
-        }
-
-        newFrontDSValue = frontDS->getValue();
-        if (newFrontDSValue > 100) {
+        // 180 Turn and go back to A7
+        turnRight();
+        turnRight();
+        for (int i = 0; i < advanceStraightCount; i++) {
             advanceTile();
-            advanceStraightCount++;
         }
-        else {
-            break;
-        }
-    }
-
-    // 180 Turn and go back to A7
-    turnRight();
-    turnRight();
-    for (int i = 0; i < advanceStraightCount; i++) {
-        advanceTile();
     }
 }
 
