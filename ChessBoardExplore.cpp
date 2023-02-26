@@ -39,6 +39,9 @@ int pos = 0;
 
 bool exitFound = false;
 
+int exitDirectionRow = 0;
+int exitDirectionColumn = 0;
+
 std::vector<std::vector<int>> chessboard{};
 
 Robot* robot;
@@ -110,6 +113,11 @@ int main(int argc, char **argv) {
   DFS_1();
 
   std::cout << "DONE DONE AND DONE\n";
+
+  std::cout << "( " << exitDirectionRow << ", " << exitDirectionColumn << " )\n";
+
+  if (exitDirectionRow == 10 && exitDirectionColumn == 11)
+      turnLeft();
 
   //travelMaze();
   //pickUpTheBox();
@@ -467,6 +475,9 @@ void DFS_1() {
             std::cout << "first\n";
             std::cout << "Exit Found\n";
             exitFound = true;
+
+            exitDirectionRow = nextRow;
+            exitDirectionColumn = nextColumn;
         }
 
         else if (chessboard[nextRow][nextRow] == 1) std::cout << "second\n";
