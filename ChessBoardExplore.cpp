@@ -30,6 +30,7 @@ bool checkPiece();
 void dropTheBox();
 void DFS();
 void DFS_1();
+void goToExit();
 
 int initialRow = 1;
 int initialColumn = 3;
@@ -110,14 +111,16 @@ int main(int argc, char **argv) {
   }
 
   //advanceTile();
-  DFS_1();
+  //DFS_1();
 
-  std::cout << "DONE DONE AND DONE\n";
+  //std::cout << "DONE DONE AND DONE\n";
 
-  std::cout << "( " << exitDirectionRow << ", " << exitDirectionColumn << " )\n";
+  //std::cout << "( " << exitDirectionRow << ", " << exitDirectionColumn << " )\n";
 
-  if (exitDirectionRow == 10 && exitDirectionColumn == 11)
-      turnLeft();
+  //if (exitDirectionRow == 10 && exitDirectionColumn == 11)
+  //    turnLeft();
+
+  goToExit();
 
   //travelMaze();
   //pickUpTheBox();
@@ -515,4 +518,16 @@ void DFS_1() {
     turnRight();
     pos -= 3;
     posCounter[pos % 4]--;
+}
+
+void goToExit() {
+    // Goes to the exit from (1,3)
+    DFS_1();
+
+    std::cout << "DONE DONE AND DONE\n";
+
+    std::cout << "( " << exitDirectionRow << ", " << exitDirectionColumn << " )\n";
+
+    if (exitDirectionRow == 10 && exitDirectionColumn == 11)
+        turnLeft();
 }
