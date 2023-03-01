@@ -122,6 +122,7 @@ int main(int argc, char **argv) {
 
   //goToExit();
   travelMaze();
+  //goToExit();
 
   //travelMaze();
   //pickUpTheBox();
@@ -321,14 +322,14 @@ void pickUpTheBox() {
     rightMotor->setVelocity(1.0);
     leftMotor->setVelocity(1.0);
 
-    gripperLift->setVelocity(0.1);
+    gripperLift->setVelocity(0.03);
     rightFinger->setVelocity(0.1);
     leftFinger->setVelocity(0.1);
 
     rightMotor->setPosition(-19);
     leftMotor->setPosition(-19);
 
-    gripperLift->setPosition(0.13);
+    gripperLift->setPosition(0.10);
     rightFinger->setPosition(0.1);
     leftFinger->setPosition(0.1);
 
@@ -339,7 +340,7 @@ void pickUpTheBox() {
 
         //cout << newFrontDSValue << "\n";
 
-        if (newFrontDSValue < 13) {
+        if (newFrontDSValue < 6) {
             rightFinger->setPosition(0.06);
             leftFinger->setPosition(0.06);
             gripperLift->setPosition(0.01);
