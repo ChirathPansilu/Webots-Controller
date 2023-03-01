@@ -307,7 +307,7 @@ bool checkPiece() {
     double frontIRValue = frontIR->getValue();
     std::cout << "FRONT IR: " << frontIRValue << "\n";
 
-    if (topDSValue < 100 && frontIRValue < 500) {
+    if (topDSValue < 500 && frontIRValue < 500) {
         std::cout << "WHITE KING FOUND\n";
 
         return true;
