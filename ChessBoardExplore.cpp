@@ -173,7 +173,7 @@ void travelMaze() {
         double newFrontDSValue = frontDS->getValue();
 
         // Check for obstacle on right
-        if (newFrontDSValue > 790) {
+        if (newFrontDSValue > 800) {
             turnLeft();
         }
         else {
@@ -184,7 +184,7 @@ void travelMaze() {
 
             // Go to the right chess piece
             int advanceRightCount = 0;
-            while (newFrontDSValue > 100) {
+            while (newFrontDSValue > 120) {
                 advanceTile();
                 advanceRightCount++;
 
@@ -243,7 +243,7 @@ void travelMaze() {
             double newFrontDSValue = frontDS->getValue();
 
             // Check for obstacle on right
-            if (newFrontDSValue > 900) {
+            if (newFrontDSValue > 950) {
                 turnRight();
             }
             else {
@@ -254,7 +254,7 @@ void travelMaze() {
 
                 // Go to the right chess piece
                 int advanceRightCount = 0;
-                while (newFrontDSValue > 100) {
+                while (newFrontDSValue > 120) {
                     advanceTile();
                     advanceRightCount++;
 
