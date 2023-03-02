@@ -203,6 +203,23 @@ void travelMaze() {
             turnLeft();
         }
 
+        //  Check for obstacle on left
+        if (!kingFound) {
+            turnLeft();
+            newFrontDSValue = frontDSLaser->getValue();
+            std::cout << "FrontDS Left: " << newFrontDSValue << "\n";
+
+            if (newFrontDSValue > 100) {
+                turnRight();
+            }
+            else {
+                std::cout << "OBSTACLE FOUND\n";
+                std::cout << "Checking the Piece\n";
+                kingFound = checkPiece();
+                turnRight();
+            }
+        }
+
         if (kingFound) {
             advanceTileBack();
             advanceTile(0.6);
@@ -345,7 +362,7 @@ void pickUpTheBox() {
         if (newFrontDSValue < 6) {
             rightFinger->setPosition(0.06);
             leftFinger->setPosition(0.06);
-            gripperLift->setPosition(0.01);
+            gripperLift->setPosition(-0.01);
         }
 
         elapsedTime++;
