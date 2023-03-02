@@ -67,98 +67,98 @@ DistanceSensor* frontIR;
 // The arguments of the main function can be specified by the
 // "controllerArgs" field of the Robot node
 int main(int argc, char **argv) {
-  // create the Robot instance.
-  robot = new Robot();
+    // create the Robot instance.
+    robot = new Robot();
 
-  // get the time step of the current world.
-  //int timeStep = (int)robot->getBasicTimeStep();
-  int timeStep = TIMESTEP;
+    // get the time step of the current world.
+    //int timeStep = (int)robot->getBasicTimeStep();
+    int timeStep = TIMESTEP;
 
-  // You should insert a getDevice-like function in order to get the
-  // instance of a device of the robot. Something like:
-  //  Motor *motor = robot->getMotor("motorname");
-  //  DistanceSensor *ds = robot->getDistanceSensor("dsname");
-  //  ds->enable(timeStep);
-  rightMotor = robot->getMotor("rightWheel");
-  leftMotor = robot->getMotor("leftWheel");
+    // You should insert a getDevice-like function in order to get the
+    // instance of a device of the robot. Something like:
+    //  Motor *motor = robot->getMotor("motorname");
+    //  DistanceSensor *ds = robot->getDistanceSensor("dsname");
+    //  ds->enable(timeStep);
+    rightMotor = robot->getMotor("rightWheel");
+    leftMotor = robot->getMotor("leftWheel");
 
-  gripperLift = robot->getMotor("lift motor");
+    gripperLift = robot->getMotor("lift motor");
 
-  rightFinger = robot->getMotor("right finger motor");
-  leftFinger = robot->getMotor("left finger motor");
+    rightFinger = robot->getMotor("right finger motor");
+    leftFinger = robot->getMotor("left finger motor");
 
-  frontDS = robot->getDistanceSensor("frontDS");
-  frontDS->enable(timeStep);
+    frontDS = robot->getDistanceSensor("frontDS");
+    frontDS->enable(timeStep);
 
-  topDS = robot->getDistanceSensor("topDS");
-  topDS->enable(timeStep);
+    topDS = robot->getDistanceSensor("topDS");
+    topDS->enable(timeStep);
 
-  frontIR = robot->getDistanceSensor("frontIR");
-  frontIR->enable(timeStep);
+    frontIR = robot->getDistanceSensor("frontIR");
+    frontIR->enable(timeStep);
 
-  // create the chessboard with extended walls
-  for (int i = 0; i < 12; i++) {
-      std::vector<int> newVec{};
-      for (int j = 0; j < 12; j++) {
-          newVec.push_back(1);
-      }
-      chessboard.push_back(newVec);
-  }
+    // create the chessboard with extended walls
+    for (int i = 0; i < 12; i++) {
+        std::vector<int> newVec{};
+        for (int j = 0; j < 12; j++) {
+            newVec.push_back(1);
+        }
+        chessboard.push_back(newVec);
+    }
 
-  for (int i = 1; i < 11; i++) {
-      for (int j = 1; j < 11; j++)
-          chessboard[i][j] = 0;
-  }
+    for (int i = 1; i < 11; i++) {
+        for (int j = 1; j < 11; j++)
+            chessboard[i][j] = 0;
+    }
 
-  //advanceTile();
-  //DFS_1();
+    //advanceTile();
+    //DFS_1();
 
-  //std::cout << "DONE DONE AND DONE\n";
+    //std::cout << "DONE DONE AND DONE\n";
 
-  //std::cout << "( " << exitDirectionRow << ", " << exitDirectionColumn << " )\n";
+    //std::cout << "( " << exitDirectionRow << ", " << exitDirectionColumn << " )\n";
 
-  //if (exitDirectionRow == 10 && exitDirectionColumn == 11)
-  //    turnLeft();
+    //if (exitDirectionRow == 10 && exitDirectionColumn == 11)
+    //    turnLeft();
 
-  //goToExit();
-  travelMaze();
-  //goToExit();
+    //goToExit();
+    travelMaze();
+    //goToExit();
 
-  //travelMaze();
-  //pickUpTheBox();
-  //turnRight();
-  //turnLeft();
-  //advanceTile();
-  //turnRight();
-  //turnLeft();
+    //travelMaze();
+    //pickUpTheBox();
+    //turnRight();
+    //turnLeft();
+    //advanceTile();
+    //turnRight();
+    //turnLeft();
 
-  // Main loop:
-  // - perform simulation steps until Webots is stopping the controller
-  //while (robot->step(timeStep) != -1) {
+    // Main loop:
+    // - perform simulation steps until Webots is stopping the controller
+    //while (robot->step(timeStep) != -1) {
 
-  //  // Read the sensors:
-  //  // Enter here functions to read sensor data, like:
-  //  //  double val = ds->getValue();
-  //    double newFrontDSValue = frontDS->getValue();
-  //  // Process sensor data here.
-  //    //cout << prevFrontDSValue - newFrontDSValue << "\n";
-  //  // Enter here functions to send actuator commands, like:
-  //  //  motor->setPosition(10.0);
-  //    cout << newFrontDSValue << "\n";
+    //  // Read the sensors:
+    //  // Enter here functions to read sensor data, like:
+    //  //  double val = ds->getValue();
+    //    double newFrontDSValue = frontDS->getValue();
+    //  // Process sensor data here.
+    //    //cout << prevFrontDSValue - newFrontDSValue << "\n";
+    //  // Enter here functions to send actuator commands, like:
+    //  //  motor->setPosition(10.0);
+    //    cout << newFrontDSValue << "\n";
 
-  //    if (newFrontDSValue < 13) {
-  //        rightFinger->setPosition(0.06);
-  //        leftFinger->setPosition(0.06);
-  //        gripperLift->setPosition(0.01);
-  //    }
+    //    if (newFrontDSValue < 13) {
+    //        rightFinger->setPosition(0.06);
+    //        leftFinger->setPosition(0.06);
+    //        gripperLift->setPosition(0.01);
+    //    }
 
-  //    //prevFrontDSValue = newFrontDSValue;
-  //};
+    //    //prevFrontDSValue = newFrontDSValue;
+    //};
 
-  // Enter here exit cleanup code.
+    // Enter here exit cleanup code.
 
-  delete robot;
-  return 0;
+    delete robot;
+    return 0;
 }
 
 void travelMaze() {
@@ -171,6 +171,7 @@ void travelMaze() {
         turnRight();
 
         double newFrontDSValue = frontDS->getValue();
+        std::cout << "FrontDS: " << newFrontDSValue << "\n";
 
         // Check for obstacle on right
         if (newFrontDSValue > 800) {
@@ -178,7 +179,7 @@ void travelMaze() {
         }
         else {
             std::cout << "OBSTACLE FOUND\n";
-            
+
             newFrontDSValue = frontDS->getValue();
             std::cout << newFrontDSValue << "\n";
 
@@ -193,7 +194,7 @@ void travelMaze() {
 
             std::cout << "CHECKING THE PIECE\n";
             kingFound = checkPiece();
-     
+
             // Come back to the main path
             for (int i = 0; i < advanceRightCount; i++) {
                 advanceTileBack();
@@ -222,13 +223,13 @@ void travelMaze() {
     }
 
     // 180 Turn and go back to A7
-    turnRight();
-    turnRight();
+    //turnRight();
+    //turnRight();
     for (int i = 0; i < advanceStraightCount; i++) {
-        advanceTile();
+        advanceTileBack();
     }
 
-    turnLeft();
+    turnRight();
     robot->step(TIMESTEP);
     bool canGoRight = frontDS->getValue() > 100;
 
@@ -241,6 +242,7 @@ void travelMaze() {
             turnLeft();
 
             double newFrontDSValue = frontDS->getValue();
+            std::cout << "FrontDS value: " << newFrontDSValue << "\n";
 
             // Check for obstacle on right
             if (newFrontDSValue > 950) {
@@ -250,7 +252,7 @@ void travelMaze() {
                 std::cout << "OBSTACLE FOUND\n";
 
                 newFrontDSValue = frontDS->getValue();
-                std::cout << newFrontDSValue << "\n";
+                std::cout << "FrontDS: " << newFrontDSValue << "\n";
 
                 // Go to the right chess piece
                 int advanceRightCount = 0;
@@ -292,10 +294,10 @@ void travelMaze() {
         }
 
         // 180 Turn and go back to A7
-        turnRight();
-        turnRight();
+        //turnRight();
+        //turnRight();
         for (int i = 0; i < advanceStraightCount; i++) {
-            advanceTile();
+            advanceTileBack();
         }
     }
 }
@@ -354,20 +356,20 @@ void pickUpTheBox() {
 }
 
 void turnRight() {
-    rightMotor->setPosition(INFINITY);  
+    rightMotor->setPosition(INFINITY);
     leftMotor->setPosition(INFINITY);
-    rightMotor->setVelocity(1.0);
-    leftMotor->setVelocity(-1.0);
-   
+    rightMotor->setVelocity(5.0);
+    leftMotor->setVelocity(-5.0);
+
     double elapsedTime = 0;
 
-    while (elapsedTime < 810) {
+    while (elapsedTime < 109) {
         robot->step(TIMESTEP);
 
         //double newFrontDSValue = frontDS->getValue();
 
         //cout << newFrontDSValue << "\n";
-
+        //std::cout << elapsedTime << "\n";
         elapsedTime++;
     }
 
@@ -378,16 +380,16 @@ void turnRight() {
 }
 
 void turnLeft() {
-    rightMotor->setPosition(INFINITY);  
+    rightMotor->setPosition(INFINITY);
     leftMotor->setPosition(INFINITY);
-    rightMotor->setVelocity(-1.0);
-    leftMotor->setVelocity(1.0);
-    
+    rightMotor->setVelocity(-5.0);
+    leftMotor->setVelocity(5.0);
+
     double elapsedTime = 0;
 
-    while (elapsedTime < 810) {
+    while (elapsedTime < 109) {
         robot->step(TIMESTEP);
-        
+
         //double newFrontDSValue = frontDS->getValue();
 
         //cout << newFrontDSValue << "\n";
@@ -407,11 +409,12 @@ void advanceTile(double s) {
     rightMotor->setPosition(INFINITY);
     leftMotor->setPosition(INFINITY);
 
-    rightMotor->setVelocity(-1.0);
-    leftMotor->setVelocity(-1.0);
+    rightMotor->setVelocity(-5.0);
+    leftMotor->setVelocity(-5.0);
 
-    while (elapsedTime < 1190 * s) {
+    while (elapsedTime < 300 * s) {
         robot->step(TIMESTEP);
+        //std::cout << elapsedTime << "\n";
         elapsedTime++;
     }
 
@@ -425,10 +428,10 @@ void advanceTileBack(double s) {
     rightMotor->setPosition(INFINITY);
     leftMotor->setPosition(INFINITY);
 
-    rightMotor->setVelocity(1.0);
-    leftMotor->setVelocity(1.0);
+    rightMotor->setVelocity(5.0);
+    leftMotor->setVelocity(5.0);
 
-    while (elapsedTime < 1190 * s) {
+    while (elapsedTime < 300 * s) {
         robot->step(TIMESTEP);
         elapsedTime++;
     }
@@ -471,7 +474,7 @@ void DFS_1() {
 
     //This is needed to get the frontDS value if this is not called before
     //robot->step(TIMESTEP);
-    
+
     int currentRow = initialRow + posCounter[0] - posCounter[2];
     int currentColumn = initialColumn + posCounter[1] - posCounter[3];
 
@@ -507,18 +510,18 @@ void DFS_1() {
     advanceTile();
     DFS_1();
     if (exitFound) return;
-    
+
     turnRight();
     pos++;
     DFS_1();
     if (exitFound) return;
-    
+
     turnLeft();
     turnLeft();
-    pos+=2;
+    pos += 2;
     DFS_1();
     if (exitFound) return;
-    
+
     //turnRight();
     //advanceTileBack();
 
