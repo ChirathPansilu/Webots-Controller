@@ -55,7 +55,7 @@ Motor* gripperLift;
 Motor* rightFinger;
 Motor* leftFinger;
 
-DistanceSensor* frontDS;
+DistanceSensor* frontDSLaser;
 DistanceSensor* topDS;
 DistanceSensor* frontIR;
 
@@ -87,8 +87,8 @@ int main(int argc, char **argv) {
     rightFinger = robot->getMotor("right finger motor");
     leftFinger = robot->getMotor("left finger motor");
 
-    frontDS = robot->getDistanceSensor("frontDS");
-    frontDS->enable(timeStep);
+    frontDSLaser = robot->getDistanceSensor("frontDSLaser");
+    frontDSLaser->enable(timeStep);
 
     topDS = robot->getDistanceSensor("topDS");
     topDS->enable(timeStep);
@@ -170,17 +170,17 @@ void travelMaze() {
     while (true) {
         turnRight();
 
-        double newFrontDSValue = frontDS->getValue();
+        double newFrontDSValue = frontDSLaser->getValue();
         std::cout << "FrontDS: " << newFrontDSValue << "\n";
 
         // Check for obstacle on right
-        if (newFrontDSValue > 800) {
+        if (newFrontDSValue > 900) {
             turnLeft();
         }
         else {
             std::cout << "OBSTACLE FOUND\n";
 
-            newFrontDSValue = frontDS->getValue();
+            newFrontDSValue = frontDSLaser->getValue();
             std::cout << newFrontDSValue << "\n";
 
             // Go to the right chess piece
@@ -189,7 +189,7 @@ void travelMaze() {
                 advanceTile();
                 advanceRightCount++;
 
-                newFrontDSValue = frontDS->getValue();
+                newFrontDSValue = frontDSLaser->getValue();
             }
 
             std::cout << "CHECKING THE PIECE\n";
@@ -212,7 +212,7 @@ void travelMaze() {
             break;
         }
 
-        newFrontDSValue = frontDS->getValue();
+        newFrontDSValue = frontDSLaser->getValue();
         if (newFrontDSValue > 100) {
             advanceTile();
             advanceStraightCount++;
@@ -231,7 +231,7 @@ void travelMaze() {
 
     turnRight();
     robot->step(TIMESTEP);
-    bool canGoRight = frontDS->getValue() > 100;
+    bool canGoRight = frontDSLaser->getValue() > 100;
 
     if (!kingFound && canGoRight) {
 
@@ -241,7 +241,7 @@ void travelMaze() {
         while (true) {
             turnLeft();
 
-            double newFrontDSValue = frontDS->getValue();
+            double newFrontDSValue = frontDSLaser->getValue();
             std::cout << "FrontDS value: " << newFrontDSValue << "\n";
 
             // Check for obstacle on right
@@ -251,7 +251,7 @@ void travelMaze() {
             else {
                 std::cout << "OBSTACLE FOUND\n";
 
-                newFrontDSValue = frontDS->getValue();
+                newFrontDSValue = frontDSLaser->getValue();
                 std::cout << "FrontDS: " << newFrontDSValue << "\n";
 
                 // Go to the right chess piece
@@ -260,7 +260,7 @@ void travelMaze() {
                     advanceTile();
                     advanceRightCount++;
 
-                    newFrontDSValue = frontDS->getValue();
+                    newFrontDSValue = frontDSLaser->getValue();
                 }
 
                 std::cout << "CHECKING THE PIECE\n";
@@ -283,7 +283,7 @@ void travelMaze() {
                 break;
             }
 
-            newFrontDSValue = frontDS->getValue();
+            newFrontDSValue = frontDSLaser->getValue();
             if (newFrontDSValue > 100) {
                 advanceTile();
                 advanceStraightCount++;
@@ -338,7 +338,7 @@ void pickUpTheBox() {
     while (elapsedTime < 1180) {
         robot->step(TIMESTEP);
 
-        double newFrontDSValue = frontDS->getValue();
+        double newFrontDSValue = frontDSLaser->getValue();
 
         //cout << newFrontDSValue << "\n";
 
@@ -412,7 +412,7 @@ void advanceTile(double s) {
     rightMotor->setVelocity(-5.0);
     leftMotor->setVelocity(-5.0);
 
-    while (elapsedTime < 300 * s) {
+    while (elapsedTime < 295 * s) {
         robot->step(TIMESTEP);
         //std::cout << elapsedTime << "\n";
         elapsedTime++;
@@ -431,7 +431,7 @@ void advanceTileBack(double s) {
     rightMotor->setVelocity(5.0);
     leftMotor->setVelocity(5.0);
 
-    while (elapsedTime < 300 * s) {
+    while (elapsedTime < 295 * s) {
         robot->step(TIMESTEP);
         elapsedTime++;
     }
@@ -451,7 +451,7 @@ void dropTheBox() {
 }
 
 void DFS() {
-    double newFrontDSValue = frontDS->getValue();
+    double newFrontDSValue = frontDSLaser->getValue();
 
     if (newFrontDSValue < 100) {
         return;
@@ -480,7 +480,7 @@ void DFS_1() {
 
     std::cout << "Current Position: (" << currentRow << ", " << currentColumn << ")\t" << chessboard[currentRow][currentColumn] << "\n";
 
-    double newFrontDSValue = frontDS->getValue();
+    double newFrontDSValue = frontDSLaser->getValue();
     std::cout << "frontDS: " << newFrontDSValue << "\n";
 
     posCounter[pos % 4]++;
