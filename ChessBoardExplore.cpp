@@ -31,6 +31,7 @@ void dropTheBox();
 void DFS();
 void DFS_1();
 void goToExit();
+void exitChessboard();
 
 int initialRow = 1;
 int initialColumn = 3;
@@ -122,6 +123,7 @@ int main(int argc, char **argv) {
 
     //goToExit();
     travelMaze();
+    exitChessboard();
     //goToExit();
 
     //travelMaze();
@@ -623,4 +625,20 @@ void goToExit() {
 
     if (exitDirectionRow == 10 && exitDirectionColumn == 11)
         turnLeft();
+}
+
+void exitChessboard() {
+    turnRight();
+    advanceTile();
+    turnRight();
+    advanceTile(0.8);
+    turnLeft();
+
+    for (int i = 0; i < 5; i++) advanceTile();
+
+    advanceTile(0.9);
+
+    turnLeft();
+
+    for (int i = 0; i < 9; i++) advanceTile();
 }
