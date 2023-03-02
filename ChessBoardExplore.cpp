@@ -246,6 +246,64 @@ void travelMaze() {
         advanceTileBack();
     }
 
+
+    // Check Left Column
+    turnLeft();
+    robot->step(TIMESTEP);
+    bool canGoLeft = frontDSLaser->getValue() > 100;
+    bool shouldTurnLeft = false;
+
+    if (!kingFound && canGoLeft) {
+        advanceTile();
+
+        turnRight();
+
+        double newFrontDSValue = frontDSLaser->getValue();
+        std::cout << "FrontDS value: " << newFrontDSValue << "\n";
+
+        if (newFrontDSValue > 950) {
+            turnLeft();
+        }
+        else {
+            std::cout << "OBSTACLE FOUND\n";
+
+            newFrontDSValue = frontDSLaser->getValue();
+            std::cout << "FrontDS: " << newFrontDSValue << "\n";
+
+            int advanceRightCount = 0;
+            while (newFrontDSValue > 120) {
+                advanceTile();
+                advanceRightCount++;
+
+                newFrontDSValue = frontDSLaser->getValue();
+            }
+
+            std::cout << "Checking the piece\n";
+            kingFound = checkPiece();
+
+            if (kingFound) shouldTurnLeft = true;
+
+            // Come back to the main path
+            for (int i = 0; i < advanceRightCount; i++) {
+                advanceTileBack();
+            }
+
+            turnLeft();
+        }
+
+        if (kingFound) {
+            advanceTileBack();
+            advanceTile(0.6);
+            dropTheBox();
+            advanceTileBack(0.6);
+        }
+        else {
+            advanceTileBack();
+        }
+
+        turnRight();
+    }
+
     turnRight();
     robot->step(TIMESTEP);
     bool canGoRight = frontDSLaser->getValue() > 100;
@@ -316,7 +374,11 @@ void travelMaze() {
         for (int i = 0; i < advanceStraightCount; i++) {
             advanceTileBack();
         }
+
+        turnLeft();
     }
+
+    if (shouldTurnLeft) turnLeft();
 }
 
 bool checkPiece() {
