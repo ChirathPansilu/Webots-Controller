@@ -20,7 +20,7 @@
 #define MAX_SPEED 12.28
 #define MID_SPEED 6.28
 #define TURN_SPEED 6.0
-#define THRESHOLD 500
+#define THRESHOLD 300
 
 #define OBSTACLE_THRESHOLD 30
 #define OBSTACLE_THRESHOLD1 40
@@ -46,6 +46,8 @@ void wallFollowing();
 void dottedLineFollowing();
 void startLineFollowing();
 void goForwardAndPickUp();
+
+void chamberExplore();
 
 int initialRow = 1;
 int initialColumn = 3;
@@ -168,6 +170,9 @@ int main(int argc, char **argv) {
     dottedLineFollowing();
     travelMaze();
     exitChessboard();
+    advanceTile(0.5);
+    chamberExplore();
+    startLineFollowing();
     //goToExit();
 
     //travelMaze();
@@ -684,7 +689,7 @@ void exitChessboard() {
 
     for (int i = 0; i < 5; i++) advanceTile();
 
-    advanceTile(0.9);
+    advanceTile(0.93);
 
     turnLeft();
 
@@ -1234,4 +1239,170 @@ void startLineFollowing() {
         }
 
     };
+}
+
+void chamberExplore() {
+    leftMotor->setPosition(INFINITY);
+    rightMotor->setPosition(INFINITY);
+
+    leftMotor->setVelocity(-5.0);
+    rightMotor->setVelocity(-5.0);
+
+    gripperLift->setVelocity(0.03);
+    rightFinger->setVelocity(0.1);
+    leftFinger->setVelocity(0.1);
+
+    gripperLift->setPosition(0.13);
+    rightFinger->setPosition(0.12);
+    leftFinger->setPosition(0.12);
+
+    // initialize sensors
+    leftSensor = robot->getDistanceSensor("leftFrontDS");
+
+    leftSensor->enable(TIMESTEP);
+
+    double newFrontDSValue = frontDSLaser->getValue();
+    double leftDSValue = leftSensor->getValue();
+
+    bool boxFound = false;
+
+    while (true) {
+        robot->step(TIMESTEP);
+
+        newFrontDSValue = frontDSLaser->getValue();
+        std::cout << newFrontDSValue << "\n";
+
+        leftDSValue = leftSensor->getValue();
+        std::cout << "Left: " << leftDSValue << "\n";
+
+        if (newFrontDSValue < 30) {
+            leftMotor->setVelocity(0.0);
+            rightMotor->setVelocity(0.0);
+            break;
+        }
+
+        if (leftDSValue < 450) {
+            advanceTile(0.35);
+            turnLeft();
+
+            boxFound = true;
+
+            leftMotor->setVelocity(0.0);
+            rightMotor->setVelocity(0.0);
+            break;
+        }
+    }
+
+    bool pickedUp = false;
+
+    if (boxFound) {
+        leftMotor->setVelocity(-5.0);
+        rightMotor->setVelocity(-5.0);
+
+        robot->step(TIMESTEP);
+        double advancedDistance = frontDSLaser->getValue();
+
+        while (true) {
+            robot->step(TIMESTEP);
+            std::cout << newFrontDSValue << '\n';
+
+            if (newFrontDSValue < 10) {
+                rightFinger->setPosition(0.06);
+                leftFinger->setPosition(0.06);
+                gripperLift->setPosition(-0.01);
+
+                pickedUp = true;
+            }
+
+            if (pickedUp && newFrontDSValue > 10) {
+                leftMotor->setVelocity(0.0);
+                rightMotor->setVelocity(0.0);
+
+                break;
+            }
+            newFrontDSValue = frontDSLaser->getValue();
+        }
+
+        double finalDistance = frontDSLaser->getValue();
+
+        leftMotor->setVelocity(5.0);
+        rightMotor->setVelocity(5.0);
+
+        while (true) {
+            robot->step(TIMESTEP);
+
+            newFrontDSValue = frontDSLaser->getValue();
+
+            if (newFrontDSValue > advancedDistance + finalDistance + 40) {
+                leftMotor->setVelocity(0.0);
+                rightMotor->setVelocity(0.0);
+
+                turnRight();
+
+                break;
+            }
+        }
+
+        leftMotor->setVelocity(-5.0);
+        rightMotor->setVelocity(-5.0);
+
+        while (true) {
+            robot->step(TIMESTEP);
+
+            newFrontDSValue = frontDSLaser->getValue();
+            std::cout << newFrontDSValue << "\n";
+
+            leftDSValue = leftSensor->getValue();
+            std::cout << "Left: " << leftDSValue << "\n";
+
+            if (newFrontDSValue < 45) {
+                leftMotor->setVelocity(0.0);
+                rightMotor->setVelocity(0.0);
+                break;
+            }
+        }
+
+        turnRight();
+
+        //read values from ir sensors
+        double ir_1_value = ir_1->getValue();
+        double ir_2_value = ir_2->getValue();
+        double ir_3_value = ir_3->getValue();
+        double ir_4_value = ir_4->getValue();
+        double ir_5_value = ir_5->getValue();
+        double ir_6_value = ir_6->getValue();
+        double ir_7_value = ir_7->getValue();
+
+        leftMotor->setVelocity(-5.0);
+        rightMotor->setVelocity(-5.0);
+
+        while (true) {
+            robot->step(TIMESTEP);
+
+            ir_1_value = ir_1->getValue();
+            ir_2_value = ir_2->getValue();
+            ir_3_value = ir_3->getValue();
+            ir_4_value = ir_4->getValue();
+            ir_5_value = ir_5->getValue();
+            ir_6_value = ir_6->getValue();
+            ir_7_value = ir_7->getValue();
+
+            if (ir_1_value < 300 ||
+                ir_2_value < 300 ||
+                ir_3_value < 300 ||
+                ir_4_value < 300 ||
+                ir_5_value < 300 ||
+                ir_6_value < 300 ||
+                ir_7_value < 300) {
+
+                leftMotor->setVelocity(0.0);
+                rightMotor->setVelocity(0.0);
+
+                leftMotor->setPosition(0.0);
+                rightMotor->setPosition(0.0);
+
+                break;
+            }
+        }
+    }
 }
