@@ -19,7 +19,10 @@
 
 #define MAX_SPEED 12.28
 #define MID_SPEED 6.28
-#define THRESHOLD 300
+#define THRESHOLD 500
+
+#define OBSTACLE_THRESHOLD 30
+#define OBSTACLE_THRESHOLD1 40
 
 // All the webots classes are defined in the "webots" namespace
 using namespace webots;
@@ -36,6 +39,8 @@ void DFS();
 void DFS_1();
 void goToExit();
 void exitChessboard();
+
+void wallFollowing();
 
 void dottedLineFollowing();
 void goForwardAndPickUp();
@@ -62,6 +67,10 @@ Motor* gripperLift;
 
 Motor* rightFinger;
 Motor* leftFinger;
+
+DistanceSensor* frontSensor;
+DistanceSensor* leftSensor;
+DistanceSensor* rightSensor;
 
 DistanceSensor* frontDSLaser;
 DistanceSensor* topDS;
@@ -152,6 +161,7 @@ int main(int argc, char **argv) {
     //if (exitDirectionRow == 10 && exitDirectionColumn == 11)
     //    turnLeft();
 
+    wallFollowing();
     dottedLineFollowing();
     travelMaze();
     exitChessboard();
@@ -939,5 +949,86 @@ void goForwardAndPickUp() {
         }
 
         newFrontDSValue = frontDSLaser->getValue();
+    }
+}
+
+void wallFollowing() {
+    leftMotor->setPosition(INFINITY);
+    rightMotor->setPosition(INFINITY);
+    leftMotor->setVelocity(0.0);
+    rightMotor->setVelocity(0.0);
+
+    // initialize sensors
+    frontSensor = robot->getDistanceSensor("frontDS");
+    leftSensor = robot->getDistanceSensor("leftFrontDS");
+    rightSensor = robot->getDistanceSensor("rightFrontDS");
+
+    //DistanceSensor *leftSensorB = robot->getDistanceSensor("leftBackDS");
+   // DistanceSensor *rightSensorB = robot->getDistanceSensor("rightBackDS");
+    frontSensor->enable(TIMESTEP);
+    leftSensor->enable(TIMESTEP);
+    rightSensor->enable(TIMESTEP);
+    //leftSensorB->enable(TIMESTEP);
+    //rightSensorB->enable(TIMESTEP);
+
+    while (robot->step(TIMESTEP) != -1) {
+
+        //read values from ir sensors
+        double ir_1_value = ir_1->getValue();
+        double ir_2_value = ir_2->getValue();
+        double ir_3_value = ir_3->getValue();
+        double ir_4_value = ir_4->getValue();
+        double ir_5_value = ir_5->getValue();
+        double ir_6_value = ir_6->getValue();
+        double ir_7_value = ir_7->getValue();
+
+        if (ir_1_value < 400 &&
+            ir_2_value < 400 &&
+            ir_3_value < 400 &&
+            ir_4_value < 400 &&
+            ir_5_value < 400 &&
+            ir_6_value < 400 &&
+            ir_7_value < 400) {
+
+            leftMotor->setVelocity(0.0);
+            rightMotor->setVelocity(0.0);
+
+            leftMotor->setPosition(0.0);
+            rightMotor->setPosition(0.0);
+
+            break;
+        }
+
+
+        double frontReading = frontSensor->getValue();
+        double leftReading = leftSensor->getValue();
+        double rightReading = rightSensor->getValue();
+        // double leftReadingB = leftSensorB->getValue();
+        // double rightReadingB = rightSensorB->getValue();
+        std::cout << "0" << std::endl;
+        // if there is an obstacle in front, turn left
+        if (frontReading > 0 && frontReading < 40) {
+            leftMotor->setVelocity(MAX_SPEED);
+            rightMotor->setVelocity(-MAX_SPEED);
+            std::cout << "1" << std::endl;
+        }
+        // if there is an obstacle on the left, turn right
+        else if (leftReading > 0 && leftReading < OBSTACLE_THRESHOLD1) {
+            leftMotor->setVelocity(-MAX_SPEED);
+            rightMotor->setVelocity(2);
+
+        }
+        // if there is an obstacle on the right, turn left
+        else if (rightReading > 0 && rightReading < OBSTACLE_THRESHOLD) {
+            leftMotor->setVelocity(2);
+            rightMotor->setVelocity(-MAX_SPEED);
+
+        }
+        // if there are no obstacles, go straight
+        else {
+            leftMotor->setVelocity(-MAX_SPEED);
+            rightMotor->setVelocity(-MAX_SPEED);
+
+        }
     }
 }
