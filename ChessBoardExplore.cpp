@@ -17,6 +17,10 @@
 #define GRIPPER_MOTOR_MAX_SPEED 0.1
 #define TIMESTEP 16
 
+#define MAX_SPEED 12.28
+#define MID_SPEED 6.28
+#define THRESHOLD 300
+
 // All the webots classes are defined in the "webots" namespace
 using namespace webots;
 
@@ -32,6 +36,9 @@ void DFS();
 void DFS_1();
 void goToExit();
 void exitChessboard();
+
+void dottedLineFollowing();
+void goForwardAndPickUp();
 
 int initialRow = 1;
 int initialColumn = 3;
@@ -59,6 +66,14 @@ Motor* leftFinger;
 DistanceSensor* frontDSLaser;
 DistanceSensor* topDS;
 DistanceSensor* frontIR;
+
+DistanceSensor* ir_2;
+DistanceSensor* ir_1;
+DistanceSensor* ir_3;
+DistanceSensor* ir_4;
+DistanceSensor* ir_5;
+DistanceSensor* ir_6;
+DistanceSensor* ir_7;
 
 // This is the main program of your controller.
 // It creates an instance of your Robot instance, launches its
@@ -97,6 +112,22 @@ int main(int argc, char **argv) {
     frontIR = robot->getDistanceSensor("frontIR");
     frontIR->enable(timeStep);
 
+    ir_1 = robot->getDistanceSensor("ir1");
+    ir_2 = robot->getDistanceSensor("ir2");
+    ir_3 = robot->getDistanceSensor("ir3");
+    ir_4 = robot->getDistanceSensor("ir4");
+    ir_5 = robot->getDistanceSensor("ir5");
+    ir_6 = robot->getDistanceSensor("ir6");
+    ir_7 = robot->getDistanceSensor("ir7");
+
+    ir_1->enable(TIMESTEP);
+    ir_2->enable(TIMESTEP);
+    ir_3->enable(TIMESTEP);
+    ir_4->enable(TIMESTEP);
+    ir_5->enable(TIMESTEP);
+    ir_6->enable(TIMESTEP);
+    ir_7->enable(TIMESTEP);
+
     // create the chessboard with extended walls
     for (int i = 0; i < 12; i++) {
         std::vector<int> newVec{};
@@ -121,7 +152,7 @@ int main(int argc, char **argv) {
     //if (exitDirectionRow == 10 && exitDirectionColumn == 11)
     //    turnLeft();
 
-    //goToExit();
+    dottedLineFollowing();
     travelMaze();
     exitChessboard();
     //goToExit();
@@ -164,7 +195,9 @@ int main(int argc, char **argv) {
 }
 
 void travelMaze() {
-    pickUpTheBox();
+    //pickUpTheBox();
+    goForwardAndPickUp();
+    advanceTile(0.1);
 
     int advanceStraightCount = 0;
     bool kingFound = false;
@@ -254,7 +287,7 @@ void travelMaze() {
     robot->step(TIMESTEP);
     bool canGoLeft = frontDSLaser->getValue() > 100;
     bool shouldTurnLeft = false;
-
+    
     if (!kingFound && canGoLeft) {
         advanceTile();
 
@@ -305,6 +338,8 @@ void travelMaze() {
 
         turnRight();
     }
+
+    if (!canGoLeft && !kingFound) turnRight();
 
     turnRight();
     robot->step(TIMESTEP);
@@ -413,8 +448,8 @@ void pickUpTheBox() {
     leftMotor->setPosition(-19);
 
     gripperLift->setPosition(0.10);
-    rightFinger->setPosition(0.1);
-    leftFinger->setPosition(0.1);
+    rightFinger->setPosition(0.12);
+    leftFinger->setPosition(0.12);
 
     while (elapsedTime < 1180) {
         robot->step(TIMESTEP);
@@ -641,4 +676,268 @@ void exitChessboard() {
     turnLeft();
 
     for (int i = 0; i < 9; i++) advanceTile();
+}
+
+void dottedLineFollowing() {
+    leftMotor->setPosition(INFINITY);
+    rightMotor->setPosition(INFINITY);
+
+    leftMotor->setVelocity(0.0);
+    rightMotor->setVelocity(0.0);
+
+    double ir_val[7] = { 0,0,0,0,0,0,0 };
+    double ir_weight[7] = { -20,-10,-5,0,5,10,20 };
+
+    // initiate PID controller
+    double error = 0;
+    double previousError = 0;
+    double totalError = 0;
+    double k_p = 0.55;
+    double k_i = 0;
+    double k_d = 0;
+
+    double red = 300;
+    double black = 500;
+
+    // Main loop:
+    // - perform simulation steps until Webots is stopping the controller
+    while (robot->step(TIMESTEP) != -1) {
+        // Read the sensors:
+        // Enter here functions to read sensor data, like:
+        //  double val = ds->getValue();
+        //double ds_left_value = ds_left->getValue();
+        //double ds_right_value = ds_right->getValue();
+        //double ds_front_value = ds_front->getValue();
+
+        //read values from ir sensors
+        double ir_1_value = ir_1->getValue();
+        double ir_2_value = ir_2->getValue();
+        double ir_3_value = ir_3->getValue();
+        double ir_4_value = ir_4->getValue();
+        double ir_5_value = ir_5->getValue();
+        double ir_6_value = ir_6->getValue();
+        double ir_7_value = ir_7->getValue();
+
+        std::cout << ir_1_value << ", " << ir_2_value << ", " << ir_3_value << ", " << ir_4_value << ", " << ir_5_value << ", " << ir_6_value << ", " << ir_7_value << "\n";
+
+
+        if ((ir_1_value<red && ir_7_value>red && ir_7_value < black) || (ir_7_value<red && ir_1_value>red && ir_1_value < black))
+        {
+            if (ir_1_value > red && ir_1_value < THRESHOLD)
+            {
+                robot->step(1000);
+                leftMotor->setVelocity(MID_SPEED);
+                rightMotor->setVelocity(0.1);
+
+                robot->step(1300);
+            }
+
+            if (ir_7_value > red && ir_7_value < THRESHOLD)
+
+            {
+                robot->step(1000);
+                leftMotor->setVelocity(0.1);
+                rightMotor->setVelocity(MID_SPEED);
+
+                robot->step(1300);
+            }
+        }
+
+        if (ir_1_value > THRESHOLD) { ir_val[0] = 1; }
+        else { ir_val[0] = 0; }
+
+        if (ir_2_value > THRESHOLD) { ir_val[1] = 1; }
+        else { ir_val[1] = 0; }
+
+        if (ir_3_value > THRESHOLD) { ir_val[2] = 1; }
+        else { ir_val[2] = 0; }
+
+        if (ir_4_value > THRESHOLD) { ir_val[3] = 1; }
+        else { ir_val[3] = 0; }
+
+        if (ir_5_value > THRESHOLD) { ir_val[4] = 1; }
+        else { ir_val[4] = 0; }
+
+        if (ir_6_value > THRESHOLD) { ir_val[5] = 1; }
+        else { ir_val[5] = 0; }
+
+        if (ir_7_value > THRESHOLD) { ir_val[6] = 1; }
+        else { ir_val[6] = 0; }
+
+        //std::cout<<"ir_1 :"<<ir_1_value<<std::endl;
+        std::cout << "ir_1 :" << ir_val[0] << std::endl;
+        //std::cout<<"ir_2 :"<<ir_2_value<<std::endl;
+        std::cout << "ir_2 :" << ir_val[1] << std::endl;
+        //std::cout<<"ir_3 :"<<ir_3_value<<std::endl;
+        std::cout << "ir_3 :" << ir_val[2] << std::endl;
+        //std::cout<<"ir_4 :"<<ir_4_value<<std::endl;
+        std::cout << "ir_4 :" << ir_val[3] << std::endl;
+        //std::cout<<"ir_5 :"<<ir_5_value<<std::endl;
+        std::cout << "ir_5 :" << ir_val[4] << std::endl;
+        //std::cout<<"ir_6 :"<<ir_6_value<<std::endl;
+        std::cout << "ir_6 :" << ir_val[5] << std::endl;
+        //std::cout<<"ir_7 :"<<ir_6_value<<std::endl;
+        std::cout << "ir_7 :" << ir_val[6] << std::endl;
+
+
+        if (ir_val[0] == 1 && ir_val[1] == 1 && ir_val[2] == 0 && ir_val[3] == 0 && ir_val[4] == 0 && ir_val[5] == 0 && ir_val[6] == 0)
+        {
+            robot->step(1000);
+            leftMotor->setVelocity(0.1);
+            rightMotor->setVelocity(MID_SPEED);
+
+            robot->step(1300);
+
+        }
+
+        else if (ir_val[0] == 0 && ir_val[1] == 0 && ir_val[2] == 0 && ir_val[3] == 0 && ir_val[4] == 0 && ir_val[5] == 1 && ir_val[6] == 1)
+        {
+            robot->step(1000);
+            leftMotor->setVelocity(MID_SPEED);
+            rightMotor->setVelocity(0.1);
+
+            robot->step(1300);
+
+        }
+
+
+
+
+
+        else
+        {
+            double error = 0;
+
+            for (int i = 0; i < 7; i++)
+            {
+                error += ir_val[i] * ir_weight[i];
+                //std::cout<<"error "<<error<<std::endl;
+            }
+
+            totalError += error;
+
+            //std::cout<<"total error "<<totalError<<std::endl;
+            double d = error - previousError;
+
+            //double PID_val = (error*k_p + d*k_d + totalError*k_i);
+            double PID_val = (error * k_p + d * k_d + totalError * k_i);
+            //std::cout<<"error "<<error<<std::endl; 
+            //std::cout<<"PID_val "<<PID_val<<std::endl;
+
+
+            //leftMotor->setVelocity(-MID_SPEED);
+            //right_motor->setVelocity(-MID_SPEED);
+
+            double right_motor_speed = MID_SPEED + PID_val;
+            double left_motor_speed = MID_SPEED - PID_val;
+
+
+            if (right_motor_speed < 0) { right_motor_speed = -0.1; }
+            if (right_motor_speed > MAX_SPEED) { right_motor_speed = MAX_SPEED; }
+
+            if (left_motor_speed < 0) { left_motor_speed = -0.1; }
+            if (left_motor_speed > MAX_SPEED) { left_motor_speed = MAX_SPEED; }
+
+            //std::cout<<"right_motor"<<right_motor_speed<<std::endl;
+            //std::cout<<"left_motor"<<left_motor_speed<<std::endl;
+
+            // Process sensor data here.
+
+            // Enter here functions to send actuator commands, like:
+            //  motor->setPosition(10.0);
+
+
+
+
+            leftMotor->setVelocity(-left_motor_speed);
+            rightMotor->setVelocity(-right_motor_speed);
+            previousError = error;
+            std::cout << "right_motor" << right_motor_speed << std::endl;
+            std::cout << "left_motor" << left_motor_speed << std::endl;
+
+
+
+
+            //print values
+            //std::cout<<"Distance sensor left :"<<ds_left_value<<std::endl;
+            //std::cout<<"Distance sensor right :"<<ds_right_value<<std::endl;
+            //std::cout<<"Distance sensor front :"<<ds_front_value<<std::endl; 
+
+            /*//std::cout<<"ir_1 :"<<ir_1_value<<std::endl;
+            std::cout<<"ir_1 :"<<ir_val[0]<<std::endl;
+            //std::cout<<"ir_2 :"<<ir_2_value<<std::endl;
+            std::cout<<"ir_2 :"<<ir_val[1]<<std::endl;
+            //std::cout<<"ir_3 :"<<ir_3_value<<std::endl;
+            std::cout<<"ir_3 :"<<ir_val[2]<<std::endl;
+            //std::cout<<"ir_4 :"<<ir_4_value<<std::endl;
+            std::cout<<"ir_4 :"<<ir_val[3]<<std::endl;
+            //std::cout<<"ir_5 :"<<ir_5_value<<std::endl;
+            std::cout<<"ir_5 :"<<ir_val[4]<<std::endl;
+            //std::cout<<"ir_6 :"<<ir_6_value<<std::endl;
+            std::cout<<"ir_6 :"<<ir_val[5]<<std::endl;
+            //std::cout<<"ir_7 :"<<ir_6_value<<std::endl;
+            std::cout<<"ir_7 :"<<ir_val[5]<<std::endl;*/
+        }
+
+        if (ir_1_value > 350 && ir_1_value < 400 &&
+            ir_2_value > 350 && ir_2_value < 400 &&
+            ir_3_value > 350 && ir_3_value < 400 &&
+            ir_4_value > 350 && ir_4_value < 400 &&
+            ir_5_value > 350 && ir_5_value < 400 &&
+            ir_6_value > 350 && ir_6_value < 400 &&
+            ir_7_value > 350 && ir_7_value < 400) {
+
+            leftMotor->setVelocity(0.0);
+            rightMotor->setVelocity(0.0);
+
+            leftMotor->setPosition(0.0);
+            rightMotor->setPosition(0.0);
+
+            break;
+        }
+
+    };
+}
+
+void goForwardAndPickUp() {
+    leftMotor->setPosition(INFINITY);
+    rightMotor->setPosition(INFINITY);
+
+    leftMotor->setVelocity(-5.0);
+    rightMotor->setVelocity(-5.0);
+
+    gripperLift->setVelocity(0.03);
+    rightFinger->setVelocity(0.1);
+    leftFinger->setVelocity(0.1);
+
+    gripperLift->setPosition(0.10);
+    rightFinger->setPosition(0.12);
+    leftFinger->setPosition(0.12);
+
+    robot->step(TIMESTEP);
+    double newFrontDSValue = frontDSLaser->getValue();
+
+    bool pickedUp = false;
+
+    while (true) {
+        robot->step(TIMESTEP);
+        std::cout << newFrontDSValue << '\n';
+
+        if (newFrontDSValue < 10) {
+            rightFinger->setPosition(0.06);
+            leftFinger->setPosition(0.06);
+            gripperLift->setPosition(-0.01);
+
+            pickedUp = true;
+        }
+
+        if (pickedUp && newFrontDSValue > 10) {
+            leftMotor->setVelocity(0.0);
+            rightMotor->setVelocity(0.0);
+
+            break;
+        }
+
+        newFrontDSValue = frontDSLaser->getValue();
+    }
 }
