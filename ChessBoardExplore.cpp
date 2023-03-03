@@ -265,7 +265,7 @@ void travelMaze() {
         }
 
         newFrontDSValue = frontDSLaser->getValue();
-        if (newFrontDSValue > 100) {
+        if (newFrontDSValue > 100 && advanceStraightCount != 7) {
             advanceTile();
             advanceStraightCount++;
         }
@@ -910,7 +910,7 @@ void goForwardAndPickUp() {
     rightFinger->setVelocity(0.1);
     leftFinger->setVelocity(0.1);
 
-    gripperLift->setPosition(0.10);
+    gripperLift->setPosition(0.13);
     rightFinger->setPosition(0.12);
     leftFinger->setPosition(0.12);
 
